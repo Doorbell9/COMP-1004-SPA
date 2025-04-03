@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <title> student planner </title>
+</head>
+<body>
+    <div class = "header">
+        <h1> My Calendar </h1>
+        <button id="login"> Login </button>
+        <button id="sign-up"> Sign Up</button>
+    </div>
+
+    <div id="login-form">
+        <h1> Login </h1>
+        <form id="loginForm">
+            <label for="username">Username: </label>
+            <input type="text" id="username" name="username" required><br><br>
+            
+            <label for="password">Password: </label>
+            <input type="password" id="password" name="password" required><br><br>
+            
+            <button type="submit">Login</button>
+            <button type="button" id="closeLoginButton">Close</button>
+          </form>
+    </div>
+
+    <div id="sign-up-form">
+        <h1> Sign Up </h1>
+        <form id="signUpForm">
+            <label for="username">Username: </label>
+            <input type="text" id="username" name="username" required><br><br>
+            
+            <label for="password">Password: </label>
+            <input type="password" id="password" name="password" required><br><br>
+            
+            <label for="email">Email: </label>
+            <input type="email" id="email" name="email" required><br><br>
+            
+            <button type="submit">Sign Up</button>
+            <button type="button" id="closeSignUpButton">Close</button>
+          </form>
+    </div>
+
+    <div id="overlay"></div>
+
+    <div id="calendar-header">
+        <button id="prev-month"> &lt; </button> <!-- Left Arrow -->
+        <span id="month-year"></span> <!-- Display the current month/year -->
+        <button id="next-month"> &gt; </button> <!-- Right Arrow -->
+    </div>
+
+    <div id="wrap">
+        <table id="Calendar">
+            <thead>
+                <tr>
+                    <th> Monday </th>
+                    <th> Tuesday </th>
+                    <th> Wednesday </th>
+                    <th> Thursday </th>
+                    <th> Friday </th>
+                    <th> Saturday </th>
+                    <th> Sunday </th>
+                </tr>
+            </thead>
+            <tbody id="calendar-body">
+
+            </tbody>
+        </table>
+    </div>
+    
+    <button id="add-event"> Add Event </button>
+    <div id="event-form">
+        <h1> Create New Event</h1>
+        <form id="eventForm">
+            <label for="eventTitle">Event Title: </label>
+            <input type="text" id="eventTitle" name="eventTitle" required><br><br>
+            
+            <label for="eventDate">Event Date: </label>
+            <input type="date" id="eventDate" name="date" required><br><br>
+
+            <label for="eventTime">Time: </label>
+            <input type="time" id="eventTime" name="eventTime" required><br><br>
+            
+            <label for="eventDescription">Description: </label>
+            <textarea id="eventDescription" name="eventDescription" required></textarea><br><br>
+
+            <label for="importance">Important?</label>
+            <input type="checkbox" id="importance" name="importance" value="important"><br><br>
+            
+            <button type="submit" id="createEvent">Create Event</button>
+            <button type="button" id="closeFormButton">Close</button>
+          </form>
+    </div>
+    
+    <div id="Reminders">
+            <h2> Reminders </h2> 
+        <div id="reminders-content">
+            <ul id="reminders-list"></ul>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
