@@ -1,6 +1,7 @@
 let currentDate = new Date();
 let currentYear = currentDate.getFullYear();
 let currentMonth = currentDate.getMonth();
+let loggedIn = false;
 
 //function to update the calendar header with the current month and year
 function updateCalendarHeader() {
@@ -45,7 +46,33 @@ function generateCalendar(year, month) {
     }
 
     const calendarCells = document.querySelectorAll('.calendar-cell');
-////////
+    calendarCells.forEach(cell => {
+      cell.addEventListener('click', function() {
+          const day = this.textContent.padStart(2, '0'); //add leading zero to day if needed
+          const month = (currentMonth + 1).toString().padStart(2, '0'); //add leading zero to month
+          const selectedDate = `${currentYear}-${month}-${day}`; //format: YYYY-MM-DD
+  
+          //fetch data from local Storage
+          const eventData = localStorage.getItem(selectedDate);
+  
+          if (eventData) {
+            const parsedData = JSON.parse(eventData);
+        
+            //if multiple events are saved for the same date, loop through them
+            const eventDetails = parsedData.map(event => `
+                Title: ${event.eventTitle || 'No title'}
+                Time: ${event.eventTime || 'No time'}
+                Description: ${event.eventDescription || 'No description'}
+                Importance: ${event.importance || 'No importance'}
+            `).join('\n\n');
+        
+            alert(`Events for ${selectedDate}:\n\n${eventDetails}`);
+        } else { 
+            alert(`No events found for ${selectedDate}`);
+        }
+
+      });
+});
 }
 
 //function to initialize the calendar using previous functions
@@ -77,8 +104,44 @@ document.getElementById('next-month').addEventListener('click', () => {
   updateCalendarHeader();
 });
 
+function populateReminders() {
+    const remindersBox = document.getElementById('reminders-list');
+    remindersBox.innerHTML = ''; //clear existing reminders
+
+    //loop through all keys in local storage
+    const importantEvents = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+
+        //check if the key is a date (in the correct format YYYY-MM-DD)
+        if (/^\d{4}-\d{2}-\d{2}$/.test(key)) {
+            const eventsForDate = JSON.parse(localStorage.getItem(key)) || [];
+
+            //filter events marked as important
+            eventsForDate.forEach(event => {
+                if (event.importance === 'important') {
+                    importantEvents.push(event);
+                }
+            });
+        }
+    }
+
+    //create a list of important events
+    if (importantEvents.length > 0) {
+        const ul = document.createElement('ul');
+        importantEvents.forEach(event => {
+            const li = document.createElement('li');
+            li.textContent = `${event.eventTitle}, ${event.eventDescription}, ${event.date}, ${event.eventTime}`;
+            ul.appendChild(li);
+        });
+        remindersBox.appendChild(ul);
+    } else {
+        remindersBox.textContent = 'No important events found.';
+    }
+}
 //these are all the event listeners for the buttons in the calendar
 window.addEventListener('load', initializeCalendar);
+window.addEventListener('load', populateReminders);
 
   document.getElementById('login').addEventListener('click', () => {
     document.getElementById('login-form').style.display = 'block';
@@ -101,6 +164,10 @@ window.addEventListener('load', initializeCalendar);
   });
 
   document.getElementById('add-event').addEventListener('click', () => {
+    if (!loggedIn) {
+        alert('Please log in to add an event.');
+        return;
+    }
     document.getElementById('event-form').style.display = 'block';
     document.getElementById('overlay').style.display = 'block';
   });
@@ -109,14 +176,16 @@ window.addEventListener('load', initializeCalendar);
       document.getElementById('event-form').style.display = 'none';
       document.getElementById('overlay').style.display = 'none';
   });
-
+  
   //code to save the event data to local storage
   document.getElementById('eventForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
-    //extract form data and create an object
     const formData = new FormData(event.target);
     const formObject = Object.fromEntries(formData.entries());
+
+    formObject.importance = document.getElementById('importance').checked ? 'important' : 'normal';
+
     const eventDate = formObject.date;
 
     if (!eventDate) {
@@ -124,23 +193,21 @@ window.addEventListener('load', initializeCalendar);
         return;
     }
 
-    //retrieve existing events from local Storage or initialize an empty array
-    let events = JSON.parse(localStorage.getItem('eventData'));
-
-    //if events is null or not an array, initialize it as an empty array
-    if (!Array.isArray(events)) {
-        console.warn('eventData is not an array or is null. Initializing as an empty array.');
-        events = [];
-    }
+    //retrieve existing events for the specific date or initialize an empty array
+    let eventsForDate = JSON.parse(localStorage.getItem(eventDate)) || [];
 
     //add the new event to the array
-    events.push(formObject);
+    eventsForDate.push(formObject);
 
-    //save the updated events array back to local Storage
-    localStorage.setItem('eventData', JSON.stringify(events));
+    //save the updated events array back to local Storage under the specific date
+    localStorage.setItem(eventDate, JSON.stringify(eventsForDate));
 
     alert(`Event saved successfully for ${eventDate}!`);
-    location.reload(); //reload the page 
+    document.getElementById('eventForm').reset();
+    document.getElementById('event-form').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+
+    populateReminders();
 });
 
 //code to save the sign-up data to local storage
@@ -183,30 +250,15 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     //check if the entered username and password match the saved data and either accept or reject the log in
     if (loginDetails.username === savedUserData.username && loginDetails.password === savedUserData.password) {
         alert('Login successful!');
+        loggedIn = true; 
     } else {
         alert('Invalid username or password. Please try again.');
     }
+
+    if (loggedIn === true) {
+        document.getElementById('login').style.display = 'none';
+        document.getElementById('sign-up').style.display = 'none';
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('login-form').style.display = 'none';
+    }
   });
-
-  function populateReminders() {
-    const remindersBox = document.getElementById('reminders-list');
-
-    //retrieve events array from localStorage
-    const events = JSON.parse(localStorage.getItem('eventData')) || [];
-
-    //filter events marked as important
-    const importantEvents = events.filter(event => event.importance === 'important');
-
-    //create a list of important events
-    const ul = document.createElement('ul');
-    importantEvents.forEach(event => {
-        const li = document.createElement('li');
-        li.textContent = `${event.eventTitle}, ${event.eventDescription}, ${event.date}, ${event.eventTime}`;
-        ul.appendChild(li);
-    });
-
-    remindersBox.appendChild(ul);
-}
-
-//call the function to populate reminders when the page loads
-window.addEventListener('load', populateReminders);

@@ -1,2 +1,3 @@
-# COMP-1004
-single webpage application
+# COMP-1004-SPA
+
+My Single Page Application (SPA) is a calendar / planner application to help people better organise their time. the focal point of the page is the calendar itself, made dynamic using JavaScript to update it depending on the month and year. the user is able to sign up on this website and create an account which they can then sign in to to see their data. users can press the big 'add event' button at the bottom of the page to bring up the event form which they can fill in. here they can fill in the title, description, time and date of the event as well as ticking a checkbox if they want to declare it as important. any events marked as important appear seperately in a reminders box so they are more easily seen and less forgetable. the user can interact with the calendar, clicking on days of the week they have something planned in order to either edit or delete their event.
