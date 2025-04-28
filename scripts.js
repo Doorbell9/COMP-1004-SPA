@@ -37,6 +37,13 @@ function generateCalendar(year, month) {
       const cell = document.createElement("td");
       cell.classList.add('calendar-cell');
       cell.textContent = day; 
+
+      const formattedDate = `${year}-${(month + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        const eventData = localStorage.getItem(formattedDate);
+        if (eventData) {
+            cell.classList.add('event-day');
+        }
+
       row.appendChild(cell);
     }
     
@@ -48,6 +55,11 @@ function generateCalendar(year, month) {
     const calendarCells = document.querySelectorAll('.calendar-cell');
     calendarCells.forEach(cell => {
       cell.addEventListener('click', function() {
+        if (!loggedIn) {
+          alert('Please log in to view events.')
+          return;
+        }
+
           const day = this.textContent.padStart(2, '0'); //add leading zero to day if needed
           const month = (currentMonth + 1).toString().padStart(2, '0'); //add leading zero to month
           const selectedDate = `${currentYear}-${month}-${day}`; //format: YYYY-MM-DD
@@ -64,15 +76,15 @@ function generateCalendar(year, month) {
                 Time: ${event.eventTime || 'No time'}
                 Description: ${event.eventDescription || 'No description'}
                 Importance: ${event.importance || 'No importance'}
+                
             `).join('\n\n');
         
             alert(`Events for ${selectedDate}:\n\n${eventDetails}`);
         } else { 
             alert(`No events found for ${selectedDate}`);
         }
-
       });
-});
+    });
 }
 
 //function to initialize the calendar using previous functions
@@ -107,6 +119,11 @@ document.getElementById('next-month').addEventListener('click', () => {
 function populateReminders() {
     const remindersBox = document.getElementById('reminders-list');
     remindersBox.innerHTML = ''; //clear existing reminders
+
+    if (!loggedIn) {
+      remindersBox.textContent = 'Please log in to view reminders.';
+      return;
+  }
 
     //loop through all keys in local storage
     const importantEvents = [];
@@ -196,10 +213,17 @@ window.addEventListener('load', populateReminders);
     //retrieve existing events for the specific date or initialize an empty array
     let eventsForDate = JSON.parse(localStorage.getItem(eventDate)) || [];
 
-    //add the new event to the array
-    eventsForDate.push(formObject);
+    //check if editing an existing event
+    const existingEventIndex = eventsForDate.findIndex(event => event.eventTitle === formObject.eventTitle);
+    if (existingEventIndex !== -1) {
+        //update the existing event
+        eventsForDate[existingEventIndex] = formObject;
+    } else {
+        //add the new event
+        eventsForDate.push(formObject);
+    }
 
-    //save the updated events array back to local Storage under the specific date
+    //save the updated events array back to localStorage
     localStorage.setItem(eventDate, JSON.stringify(eventsForDate));
 
     alert(`Event saved successfully for ${eventDate}!`);
@@ -207,7 +231,113 @@ window.addEventListener('load', populateReminders);
     document.getElementById('event-form').style.display = 'none';
     document.getElementById('overlay').style.display = 'none';
 
+    const [year, month, day] = eventDate.split('-');
+    const calendarCells = document.querySelectorAll('.calendar-cell');
+    calendarCells.forEach(cell => {
+        if (cell.textContent === parseInt(day, 10).toString() && currentYear === parseInt(year, 10) && currentMonth === parseInt(month, 10) - 1) {
+            cell.classList.add('event-day');
+        }
+    });
+
     populateReminders();
+});
+
+//edit event process
+document.getElementById('edit-event').addEventListener('click', () => {
+  if (!loggedIn) {
+      alert('Please log in to edit an event.');
+      return;
+  }
+
+  const selectedDate = prompt('Enter the date (YYYY-MM-DD) of the event you want to edit:');
+  if (!selectedDate || !/^\d{4}-\d{2}-\d{2}$/.test(selectedDate)) {
+      alert('Please enter a valid date in the format YYYY-MM-DD.');
+      return;
+  }
+
+  const eventsForDate = JSON.parse(localStorage.getItem(selectedDate)) || [];
+  if (eventsForDate.length === 0) {
+      alert(`No events found for ${selectedDate}.`);
+      return;
+  }
+
+  //if multiple events exist, let the user choose one
+  if (eventsForDate.length > 1) {
+      const eventTitles = eventsForDate.map((event, index) => `${index + 1}. ${event.eventTitle || 'Untitled Event'}`);
+      const choice = prompt(`Multiple events found for ${selectedDate}:\n\n${eventTitles.join('\n')}\n\nEnter the number of the event you want to edit:`);
+
+      const eventIndex = parseInt(choice, 10) - 1;
+      if (isNaN(eventIndex) || eventIndex < 0 || eventIndex >= eventsForDate.length) {
+          alert('Invalid selection. Please try again.');
+          return;
+      }
+
+      //populate the form with the selected event's data
+      populateEventForm(eventsForDate[eventIndex], selectedDate);
+  } else {
+      //if only one event exists, pre-fill the form with its data
+      populateEventForm(eventsForDate[0], selectedDate);
+  }
+});
+
+//function to populate the event form
+function populateEventForm(eventData, date) {
+  document.getElementById('eventTitle').value = eventData.eventTitle || '';
+  document.getElementById('eventDescription').value = eventData.eventDescription || '';
+  document.getElementById('eventTime').value = eventData.eventTime || '';
+  document.getElementById('importance').checked = eventData.importance === 'important';
+  document.getElementById('eventDate').value = date;
+
+  //show the form and overlay
+  document.getElementById('event-form').style.display = 'block';
+  document.getElementById('overlay').style.display = 'block';
+}
+
+document.getElementById('deleteEvent').addEventListener('click', () => {
+  const eventDate = document.getElementById('eventDate').value;
+  const eventTitle = document.getElementById('eventTitle').value;
+
+  if (!eventDate || !eventTitle) {
+      alert('Please select a valid event to delete.');
+      return;
+  }
+
+  //retrieve events for the selected date
+  let eventsForDate = JSON.parse(localStorage.getItem(eventDate)) || [];
+
+  //find the index of the event to delete
+  const eventIndex = eventsForDate.findIndex(event => event.eventTitle === eventTitle);
+
+  if (eventIndex === -1) {
+      alert('Event not found.');
+      return;
+  }
+
+  //remove the event from the array
+  eventsForDate.splice(eventIndex, 1);
+
+  //update or remove the date key in localStorage
+  if (eventsForDate.length > 0) {
+      localStorage.setItem(eventDate, JSON.stringify(eventsForDate));
+  } else {
+      localStorage.removeItem(eventDate);
+
+      //remove the highlight from the corresponding calendar cell
+      const [year, month, day] = eventDate.split('-');
+      const calendarCells = document.querySelectorAll('.calendar-cell');
+      calendarCells.forEach(cell => {
+          if (cell.textContent === parseInt(day, 10).toString() && currentYear === parseInt(year, 10) && currentMonth === parseInt(month, 10) - 1) {
+              cell.classList.remove('event-day');          
+            }
+      });
+  }
+
+  alert(`Event "${eventTitle}" on ${eventDate} has been deleted.`);
+
+  //close the form and refresh reminders
+  document.getElementById('event-form').style.display = 'none';
+  document.getElementById('overlay').style.display = 'none';
+  populateReminders();
 });
 
 //code to save the sign-up data to local storage
@@ -251,14 +381,58 @@ document.getElementById('loginForm').addEventListener('submit', function(event) 
     if (loginDetails.username === savedUserData.username && loginDetails.password === savedUserData.password) {
         alert('Login successful!');
         loggedIn = true; 
-    } else {
-        alert('Invalid username or password. Please try again.');
-    }
 
-    if (loggedIn === true) {
         document.getElementById('login').style.display = 'none';
         document.getElementById('sign-up').style.display = 'none';
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('login-form').style.display = 'none';
+        document.getElementById('profile').style.display = 'block'; 
+
+        populateReminders();
+    } else {
+        alert('Invalid username or password. Please try again.');
+    }
+  });
+
+  document.getElementById('profile').addEventListener('click', () => {
+    if (!loggedIn) {
+      alert('Please log in to view your profile.');
+      return;
+    }
+  
+    //retrieve the saved user data from local storage
+    const savedUserData = JSON.parse(localStorage.getItem('signUpData'));
+  
+    //populate the sign-up form with the users data
+    document.getElementById('signUpUsername').value = savedUserData.username || '';
+    document.getElementById('signUpPassword').value = savedUserData.password || '';
+    document.getElementById('email').value = savedUserData.email || '';
+  
+    //show the sign-up form and overlay
+    document.getElementById('sign-up-form').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+  });
+
+  document.getElementById('deleteProfile').addEventListener('click', () => {
+    if (!loggedIn) {
+      alert('You must be logged in to delete your profile.');
+      return;
+    }
+  
+    const confirmation = confirm('Are you sure you want to delete your profile? This action cannot be undone.');
+    if (confirmation) {
+      //remove the user's data from local storage
+      localStorage.removeItem('signUpData');
+      loggedIn = false;
+  
+      //reset the UI
+      document.getElementById('login').style.display = 'block';
+      document.getElementById('sign-up').style.display = 'block';
+      document.getElementById('profile').style.display = 'none';
+      document.getElementById('sign-up-form').style.display = 'none';
+      document.getElementById('overlay').style.display = 'none';
+  
+      alert('Your profile has been deleted.');
+      location.reload(); 
     }
   });

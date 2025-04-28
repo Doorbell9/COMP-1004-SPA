@@ -10,11 +10,12 @@
         <h1> My Calendar </h1>
         <button id="login"> Login </button>
         <button id="sign-up"> Sign Up</button>
+        <button id="profile"> profile </button>
     </div>
 
     <div id="login-form">
         <h1> Login </h1>
-        <form id="loginForm">
+        <form id="loginForm" method="post">
             <label for="username">Username: </label>
             <input type="text" id="username" name="username" required><br><br>
             
@@ -28,17 +29,18 @@
 
     <div id="sign-up-form">
         <h1> Sign Up </h1>
-        <form id="signUpForm">
-            <label for="username">Username: </label>
-            <input type="text" id="username" name="username" required><br><br>
+        <form id="signUpForm" method="post">
+            <label for="signUpUsername">Username: </label>
+            <input type="text" id="signUpUsername" name="username" required><br><br>
             
-            <label for="password">Password: </label>
-            <input type="password" id="password" name="password" required><br><br>
+            <label for="signUpPassword">Password: </label>
+            <input type="password" id="signUpPassword" name="password" required><br><br>
             
             <label for="email">Email: </label>
             <input type="email" id="email" name="email" required><br><br>
             
             <button type="submit">Sign Up</button>
+            <button type="button" id="deleteProfile">Delete Profile</button>
             <button type="button" id="closeSignUpButton">Close</button>
           </form>
     </div>
@@ -46,9 +48,9 @@
     <div id="overlay"></div>
 
     <div id="calendar-header">
-        <button id="prev-month"> &lt; </button> <!-- Left Arrow -->
-        <span id="month-year"></span> <!-- Display the current month/year -->
-        <button id="next-month"> &gt; </button> <!-- Right Arrow -->
+        <button id="prev-month"> &lt; </button> 
+        <span id="month-year"></span>
+        <button id="next-month"> &gt; </button>
     </div>
 
     <div id="wrap">
@@ -90,10 +92,13 @@
             <input type="checkbox" id="importance" name="importance" value="important"><br><br>
             
             <button type="submit" id="createEvent">Create Event</button>
+            <button type="button" id="deleteEvent">Delete Event</button>
             <button type="button" id="closeFormButton">Close</button>
           </form>
     </div>
     
+    <button id="edit-event"> Edit Events </button>
+
     <div id="Reminders">
             <h2> Reminders </h2> 
         <div id="reminders-content">

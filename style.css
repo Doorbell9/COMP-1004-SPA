@@ -20,6 +20,7 @@ body {
 .header h1{
     color: white;
     text-shadow: black 1px 1px 2px;
+    margin-left: 10px;
 }
 
 #login {
@@ -59,6 +60,25 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
+#profile {
+    display: none;
+    border: 1px solid black;
+    background-color: #007bff; 
+    color: white;
+    padding: 10px;
+    margin-right: 10px;
+    border-radius: 8px; 
+    cursor: pointer;
+}
+
+#profile:hover {
+    background-color: #0056b3; 
+    transition: background-color 0.2s ease; 
+    font-weight: bold; 
+    font-size: 16px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
 .Calendar{
     width: 100%;
     table-layout: fixed;
@@ -83,6 +103,12 @@ body {
     color: #333333;
 }
 
+.event-day {
+    background-color: #5A8ECF; 
+    color: #000; 
+    font-weight: bold; 
+}
+
 #calendar-header {
     background-color: #5A8ECF;
     color: white;
@@ -100,6 +126,14 @@ body {
     color: white;
     font-size: 18px;
     cursor: pointer;
+}
+
+#calendar-header button:hover {
+    background-color: #0056b3; 
+    transition: background-color 0.2s ease; 
+    font-weight: bold; 
+    font-size: 16px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
 #calendar-header #month-year {
@@ -158,7 +192,7 @@ body {
   }
 
 #add-event {
-    width: 500px;
+    width: 400px;
     height: 300px;
     font-size: 25px;
     border: 2px solid black;
@@ -169,11 +203,42 @@ body {
     float: left;
     margin-bottom: 20px;
     margin-top: 20px;
-    margin-left: 130px;
+    margin-left: 100px;
+}
+
+#add-event:hover {
+    background-color: #0056b3; 
+    transition: background-color 0.2s ease; 
+    font-weight: bold; 
+    font-size: 30px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+#edit-event {
+    width: 400px;
+    height: 300px;
+    font-size: 25px;
+    border: 2px solid black;
+    background-color: #007bff; 
+    color: white;
+    border-radius: 8px; 
+    cursor: pointer;
+    float: left;
+    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-left: 50px;
+}
+
+#edit-event:hover {
+    background-color: #0056b3; 
+    transition: background-color 0.2s ease; 
+    font-weight: bold; 
+    font-size: 30px; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
 }
 
 #Reminders {
-    width: 500px;
+    width: 400px;
     height: 300px;
     border: 2px solid black;
     display: flex;
@@ -186,7 +251,7 @@ body {
     float: right;
     margin-bottom: 20px;
     margin-top: 20px;
-    margin-right: 130px;
+    margin-right: 100px;
 }
 
 #Reminders h2 {
