@@ -65,6 +65,7 @@ body {
     border: 1px solid black;
     background-color: #007bff; 
     color: white;
+    margin-left: auto;
     padding: 10px;
     margin-right: 10px;
     border-radius: 8px; 

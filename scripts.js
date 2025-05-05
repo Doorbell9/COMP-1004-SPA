@@ -87,8 +87,8 @@ function generateCalendar(year, month) {
     });
 }
 
-//function to initialize the calendar using previous functions
-function initializeCalendar() {
+//function to initialise the calendar using previous functions
+function initialiseCalendar() {
   generateCalendar(currentYear, currentMonth);
   updateCalendarHeader();
 }
@@ -157,7 +157,7 @@ function populateReminders() {
     }
 }
 //these are all the event listeners for the buttons in the calendar
-window.addEventListener('load', initializeCalendar);
+window.addEventListener('load', initialiseCalendar);
 window.addEventListener('load', populateReminders);
 
   document.getElementById('login').addEventListener('click', () => {
@@ -210,7 +210,7 @@ window.addEventListener('load', populateReminders);
         return;
     }
 
-    //retrieve existing events for the specific date or initialize an empty array
+    //retrieve existing events for the specific date or initialise an empty array
     let eventsForDate = JSON.parse(localStorage.getItem(eventDate)) || [];
 
     //check if editing an existing event
